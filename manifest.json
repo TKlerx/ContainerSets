@@ -21,9 +21,9 @@
     "storage"
   ],
 
-  "background": {
-    "service_worker": "background.js"
-  },
+"background": {
+  "scripts": ["background.js"]
+},
 
   "options_ui": {
     "page": "options/options.html",

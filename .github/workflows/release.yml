@@ -1,0 +1,64 @@
+name: Build & Release XPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify tag matches manifest.json version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}".TrimStart("v")
+          Write-Host "Tag version: $tag"
+
+          $manifest = Get-Content ./manifest.json -Raw | ConvertFrom-Json
+          $manifestVersion = $manifest.version
+          Write-Host "Manifest version: $manifestVersion"
+
+          if ([string]::IsNullOrWhiteSpace($manifestVersion)) {
+            throw "manifest.json has no version"
+          }
+
+          if ($manifestVersion -ne $tag) {
+            throw "Version mismatch: tag=$tag manifest.json=$manifestVersion"
+          }
+
+          Write-Host "Version check OK"
+
+      - name: Build XPI
+        shell: pwsh
+        run: |
+          pwsh ./build-release.ps1
+
+      - name: Find XPI
+        id: find
+        shell: pwsh
+        run: |
+          $xpi = Get-ChildItem -Path ./release -Filter "*.xpi" |
+                 Sort-Object LastWriteTime -Descending |
+                 Select-Object -First 1
+
+          if (-not $xpi) {
+            throw "No .xpi found in ./release"
+          }
+
+          "xpi_path=$($xpi.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Found: $($xpi.FullName)"
+
+      - name: Create GitHub Release and upload asset
+        if: ${{ !env.ACT }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.find.outputs.xpi_path }}
+          generate_release_notes: true
