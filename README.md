@@ -21,10 +21,11 @@ without repetitive manual steps.
   (group order = shortcut order)
 - **Avoids duplicate tabs**
 - Fully local – **no tracking, no analytics, no network requests**
+- Full internationalization (currently EN / DE)
 
 ---
 
-## 🧠 How it works
+## 🧠 How It Works
 
 1. Open the add-on options
 2. Create one or more container groups
@@ -85,37 +86,123 @@ All configuration and settings are stored locally using Firefox’s
 
 ---
 
-## 🇩🇪 Deutsch
+## 🚀 Creating a New Release
 
-### Container Sets – Tabs in Container-Gruppen öffnen
+This project follows **Semantic Versioning** and **Keep a Changelog**.
+Releases are created via Git tags and built automatically using GitHub Actions.
 
-**Container Sets** ermöglicht es, den aktuellen Tab gleichzeitig in mehreren
-Firefox-Containern zu öffnen.
-
-Statt dieselbe Seite manuell in verschiedenen Containern neu zu öffnen,
-kannst du Container-Gruppen definieren und sie mit einem Klick oder
-Tastenkürzel öffnen.
+### Prerequisites
+- All changes for the release are listed under `## [Unreleased]` in `CHANGELOG.md`
+- PowerShell 7+ (`pwsh`) is installed
+- You have push rights to the repository
 
 ---
 
+### Step-by-Step Release Process
+
+#### 1. Update the version
+Update the version number in `manifest.json`:
+
+```json
+{
+  "version": "1.1.0"
+}
+```
+#### 2. Prepare the changelog
+
+Move all entries from ## [Unreleased] into a new version section:
+
+```
+pwsh ./scripts/prepare-release.ps1
+```
+
+This will:
+* create a new section like ## [1.1.0] – YYYY-MM-DD
+* move all unreleased changes into it
+* reset ## [Unreleased] for future development
+
+Review CHANGELOG.md after running the script.
+
+#### 3. Local Validation (Recommended)
+Before creating a Git tag, you can run the full validation and build
+process locally to catch errors early.
+
+```bash
+pwsh ./scripts/validate-changelog.ps1 -Version 1.1.0
+pwsh ./build-release.ps1
+```
+This will verify that:
+* CHANGELOG.md contains a valid entry for the given version
+* the changelog follows the expected structure
+* the version in manifest.json is usable
+* the add-on builds successfully
+* the generated .xpi has a valid Firefox-compatible structure
+
+If any of these checks fail, the scripts will exit with an error.
+Fix the reported issue before proceeding with the release.
+
+Running these checks locally is optional, but strongly recommended to
+avoid failed CI runs or broken releases.
+
+#### 4. Commit the release changes
+```bash
+git add manifest.json CHANGELOG.md
+git commit -m "Release 1.1.0"
+```
+#### 5. Create and push the Git tag
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+#### 6. Automated build & release
+After pushing the tag:
+* GitHub Actions builds the .xpi file
+* The version is validated against manifest.json
+* Release notes are generated from CHANGELOG.md
+* A GitHub Release is created automatically
+* The built .xpi is attached as a release asset
+
+No manual build or upload steps are required.
 ## 📦 Build & Release
 
-A signed `.xpi` file can be built using:
+### Local Build
 
-```powershell
-.\build-release.ps1
+A Firefox-compatible `.xpi` file can be built locally using PowerShell
+(cross-platform via `pwsh`):
+
+```bash
+pwsh ./build-release.ps1
 ```
-## Author
-Timo Klerx
+The build process:
+* uses a strict allowlist
+* ensures correct XPI folder structure
+* enforces POSIX-style paths (/) inside the archive
+* validates required directories (_locales, options, icons)
 
-github: https://github.com/TKlerx/ContainerSets
+The resulting .xpi file is written to:
+./release
 
-## License
+### Automated Releases (GitHub Actions)
 
-This project is licensed under the
-GNU General Public License v3.0 or later (GPL-3.0-or-later).
+Releases are built automatically using GitHub Actions:
+* A Git tag in the form vX.Y.Z triggers the release workflow
+* The version in manifest.json must match the tag
+* The .xpi is built in CI and attached to the GitHub Release
+* Release notes are generated directly from CHANGELOG.md
+This guarantees reproducible and verifiable release artifacts.
 
-## 🤖 Development Note
+## 🧑‍💻 Development
+Requirements:
+* PowerShell 7+ (pwsh)
+* Git
+* Firefox (for local testing)
 
-Parts of this project were developed with the assistance of AI-based tools.
-All code was reviewed, tested, and finalized by the author.
+## Author 
+Timo Klerx 
+github: https://github.com/TKlerx/ContainerSets 
+
+## License 
+This project is licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later). 
+## 🤖 Development Note 
+Parts of this project were developed with the assistance of AI-based tools. All code was reviewed, tested, and finalized by the author.

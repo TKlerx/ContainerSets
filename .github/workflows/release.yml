@@ -55,10 +55,42 @@ jobs:
 
           "xpi_path=$($xpi.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           Write-Host "Found: $($xpi.FullName)"
+      - name: Generate release notes from CHANGELOG
+        id: notes
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}".TrimStart("v")
+          $changelogPath = Join-Path $PWD "CHANGELOG.md"
+
+          if (-not (Test-Path $changelogPath)) {
+            throw "CHANGELOG.md not found"
+          }
+
+          $content = Get-Content $changelogPath -Raw
+
+          $pattern = "(?ms)^\s*##\s*(?:\[(?<ver>[^\]]+)\]|(?<ver>[0-9]+\.[0-9]+\.[0-9]+))\s*(?:-.*)?\s*$\r?\n(?<body>.*?)(?=^\s*##\s|\z)"
+
+          $matches = [regex]::Matches($content, $pattern)
+
+          $section = $matches | Where-Object { $_.Groups["ver"].Value -eq $tag } | Select-Object -First 1
+          if (-not $section) {
+            throw "No CHANGELOG section found for version $tag"
+          }
+
+          $notes = $section.Groups["body"].Value.Trim()
+          if ([string]::IsNullOrWhiteSpace($notes)) {
+            throw "CHANGELOG section for $tag is empty"
+          }
+
+          $outPath = Join-Path $PWD "release-notes.md"
+          Set-Content -Path $outPath -Value $notes -Encoding utf8
+
+          "notes_path=$outPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Create GitHub Release and upload asset
         if: ${{ !env.ACT }}
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.find.outputs.xpi_path }}
-          generate_release_notes: true
+          body_path: ${{ steps.notes.outputs.notes_path }}
+
