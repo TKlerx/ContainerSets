@@ -1,0 +1,41 @@
+{
+  "extensionName": { "message": "Open Tab in Container Groups" },
+  "extensionDescription": { "message": "Open the current tab in configurable container groups and avoid duplicates." },
+
+  "menuRootTitle": { "message": "Open tab in…" },
+  "noGroupsConfigured": { "message": "(No groups configured)" },
+  "unnamedGroup": { "message": "(Unnamed group)" },
+  "editGroupsMenuItem": { "message": "Edit groups…" },
+
+  "optionsTitle": { "message": "Container Groups" },
+  "optionsHeader": { "message": "Container Groups" },
+  "optionsIntro": { "message": "Create groups and choose which containers belong to each group." },
+
+  "focusExistingLabel": { "message": "If a tab already exists, switch to it instead of opening a new one" },
+
+  "newGroupButton": { "message": "+ New group" },
+  "saveButton": { "message": "Save" },
+  "deleteButton": { "message": "Delete group" },
+
+  "cmdOpenGroup1": { "message": "Open tab in group 1" },
+  "cmdOpenGroup2": { "message": "Open tab in group 2" },
+  "cmdOpenGroup3": { "message": "Open tab in group 3" },
+  
+  "shortcutHint": {
+    "message": "Hint: Group order maps to shortcuts #1 / #2 / #3."
+  },
+  "savedStatus": {
+    "message": "Saved ✓"
+  },
+  "selectedCount": {
+    "message": "$1 selected"
+  },
+  "newGroupDefaultName": {
+    "message": "New group"
+  },
+  "shortcutBadgeTooltip": {
+  "message": "Shortcut #$1 — reorder groups via drag & drop to change"
+}
+
+
+}

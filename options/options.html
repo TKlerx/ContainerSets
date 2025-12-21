@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title data-i18n="optionsTitle"></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font: 14px/1.45 system-ui, sans-serif; margin: 20px; max-width: 980px; }
+    h2 { margin: 0 0 8px; }
+    .muted { opacity: .75; }
+
+    .grid { display: grid; grid-template-columns: 340px 1fr; gap: 18px; margin-top: 14px; }
+    .card { border: 1px solid rgba(0,0,0,.15); border-radius: 14px; padding: 12px; background: #fff; }
+    .row { display:flex; align-items:center; justify-content: space-between; gap: 12px; }
+    .toolbar { display:flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+
+    button {
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.2);
+      background: #fff;
+      cursor: pointer;
+    }
+    button.primary { background: #111; color: #fff; border-color: #111; }
+    button.danger { border-color: rgba(200,0,0,.35); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.2);
+      box-sizing: border-box;
+    }
+
+    /* Groups list (Drag & Drop) */
+    .groups-list { margin-top: 10px; }
+    .group-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid rgba(0,0,0,.18);
+      border-radius: 12px;
+      margin: 6px 0;
+      background: #fff;
+      cursor: grab;
+      user-select: none;
+    }
+    .group-row:active { cursor: grabbing; }
+    .group-row.active { outline: 2px solid rgba(0,0,0,.35); }
+    .group-row.dragging { opacity: 0.55; }
+    .group-row.drop-target { border-style: dashed; }
+
+    .badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border: 1px solid rgba(0,0,0,.25);
+      border-radius: 999px;
+      opacity: 0.85;
+      min-width: 28px;
+      text-align: center;
+    }
+
+    .group-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Containers */
+    .container-row { display:flex; align-items:center; gap: 10px; padding: 6px 0; }
+    .status { font-size: 12px; opacity: .75; }
+    .hint { font-size: 12px; opacity: .75; }
+    .divider { height: 1px; background: rgba(0,0,0,.1); margin: 12px 0; }
+
+    label.chk { display:flex; align-items:center; gap: 8px; }
+	
+	
+	/* Tooltip */
+.badge {
+  position: relative; /* needed for tooltip positioning */
+}
+
+.badge[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: 120%;
+  z-index: 10;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.2);
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+  font-size: 12px;
+}
+
+.badge[data-tooltip]:hover::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 105%;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-left: 1px solid rgba(0,0,0,.2);
+  border-top: 1px solid rgba(0,0,0,.2);
+  transform: rotate(45deg);
+  z-index: 11;
+}
+
+
+  </style>
+</head>
+<body>
+  <h2 data-i18n="optionsHeader"></h2>
+  <p class="muted" data-i18n="optionsIntro"></p>
+
+  <div class="card">
+    <div class="row" style="justify-content: flex-start;">
+      <label class="chk">
+        <input id="focusExisting" type="checkbox" />
+        <span data-i18n="focusExistingLabel"></span>
+      </label>
+      <span id="settingsStatus" class="status"></span>
+    </div>
+    <div class="hint" style="margin-top:6px;" data-i18n="shortcutHint">
+      Hint: Group order maps to shortcuts #1/#2/#3.
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Left: groups -->
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="groupsTitle"></strong>
+        <span id="groupCount" class="status"></span>
+      </div>
+
+      <div class="toolbar">
+        <button id="newGroup" class="primary" data-i18n="newGroupButton"></button>
+      </div>
+
+      <div id="groups" class="groups-list"></div>
+    </div>
+
+    <!-- Right: editor -->
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="editGroupTitle"></strong>
+        <span id="editStatus" class="status"></span>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <label class="muted" data-i18n="groupNameLabel"></label>
+        <input id="groupName" type="text" data-i18n-placeholder="groupNamePlaceholder" />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <span class="muted" data-i18n="selectContainersLabel"></span>
+        <span id="containerHint" class="status"></span>
+      </div>
+      <div id="containers"></div>
+
+      <div class="toolbar">
+        <button id="saveGroup" class="primary" data-i18n="saveButton"></button>
+        <button id="deleteGroup" class="danger" data-i18n="deleteButton"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
