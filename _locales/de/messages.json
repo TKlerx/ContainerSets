@@ -1,26 +1,56 @@
 {
-  "extensionName": { "message": "Tab in Container-Gruppen öffnen" },
-  "extensionDescription": { "message": "Öffnet den aktuellen Tab in konfigurierbaren Container-Gruppen und vermeidet Duplikate." },
-
-  "menuRootTitle": { "message": "Tab öffnen in…" },
-  "noGroupsConfigured": { "message": "(Keine Gruppen konfiguriert)" },
-  "unnamedGroup": { "message": "(Unbenannte Gruppe)" },
-  "editGroupsMenuItem": { "message": "Gruppen bearbeiten…" },
-
-  "optionsTitle": { "message": "Container-Gruppen" },
-  "optionsHeader": { "message": "Container-Gruppen" },
-  "optionsIntro": { "message": "Lege Gruppen an und wähle pro Gruppe die Container aus." },
-
-  "focusExistingLabel": { "message": "Wenn der Tab schon existiert, zu ihm wechseln statt neu zu öffnen" },
-
-  "newGroupButton": { "message": "+ Neue Gruppe" },
-  "saveButton": { "message": "Speichern" },
-  "deleteButton": { "message": "Gruppe löschen" },
-
-  "cmdOpenGroup1": { "message": "Tab in Gruppe 1 öffnen" },
-  "cmdOpenGroup2": { "message": "Tab in Gruppe 2 öffnen" },
-  "cmdOpenGroup3": { "message": "Tab in Gruppe 3 öffnen" },
-    "shortcutHint": {
+  "extensionName": {
+    "message": "Tab in Container-Gruppen öffnen"
+  },
+  "extensionDescription": {
+    "message": "Öffnet den aktuellen Tab in konfigurierbaren Container-Gruppen und vermeidet Duplikate."
+  },
+  "menuRootTitle": {
+    "message": "Tab öffnen in…"
+  },
+  "menuRootTitleLink": {
+    "message": "Link öffnen in…"
+  },
+  "noGroupsConfigured": {
+    "message": "(Keine Gruppen konfiguriert)"
+  },
+  "unnamedGroup": {
+    "message": "(Unbenannte Gruppe)"
+  },
+  "editGroupsMenuItem": {
+    "message": "Gruppen bearbeiten…"
+  },
+  "optionsTitle": {
+    "message": "Container-Gruppen"
+  },
+  "optionsHeader": {
+    "message": "Container-Gruppen"
+  },
+  "optionsIntro": {
+    "message": "Lege Gruppen an und wähle pro Gruppe die Container aus."
+  },
+  "focusExistingLabel": {
+    "message": "Wenn der Tab schon existiert, zu ihm wechseln statt neu zu öffnen"
+  },
+  "newGroupButton": {
+    "message": "+ Neue Gruppe"
+  },
+  "saveButton": {
+    "message": "Speichern"
+  },
+  "deleteButton": {
+    "message": "Gruppe löschen"
+  },
+  "cmdOpenGroup1": {
+    "message": "Tab in Gruppe 1 öffnen"
+  },
+  "cmdOpenGroup2": {
+    "message": "Tab in Gruppe 2 öffnen"
+  },
+  "cmdOpenGroup3": {
+    "message": "Tab in Gruppe 3 öffnen"
+  },
+  "shortcutHint": {
     "message": "Hinweis: Die Reihenfolge der Gruppen bestimmt die Shortcuts #1 / #2 / #3."
   },
   "savedStatus": {
@@ -33,7 +63,6 @@
     "message": "Neue Gruppe"
   },
   "shortcutBadgeTooltip": {
-  "message": "Shortcut #$1 — ziehe Gruppen per Drag & Drop um, um das zu ändern"
-}
-
+    "message": "Shortcut #$1 — ziehe Gruppen per Drag & Drop um, um das zu ändern"
+  }
 }

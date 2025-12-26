@@ -3,6 +3,7 @@
   "extensionDescription": { "message": "Open the current tab in configurable container groups and avoid duplicates." },
 
   "menuRootTitle": { "message": "Open tab in…" },
+  "menuRootTitleLink": { "message": "Open link in…" },
   "noGroupsConfigured": { "message": "(No groups configured)" },
   "unnamedGroup": { "message": "(Unnamed group)" },
   "editGroupsMenuItem": { "message": "Edit groups…" },

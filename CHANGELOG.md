@@ -8,7 +8,7 @@ and this project adheres to *Semantic Versioning*.
 ---
 
 ## [Unreleased]
-
+- Possibility to right click on a link and open it in a container set
 ---
 
 ## [1.0.0] – 2025-12-21

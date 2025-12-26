@@ -38,8 +38,10 @@ async function findExistingTab(url, cookieStoreId) {
 
 /* ---------- open logic (shared) ---------- */
 
-async function openTabInGroupByIndex(tab, index) {
-  if (!tab || !tab.url || !/^https?:\/\//i.test(tab.url)) return;
+
+
+async function openUrlInGroupByIndex(url, index) {
+  if (!url || !/^https?:\/\//i.test(url)) return;
 
   const groups = await getGroups();
   const group = groups[index];
@@ -52,7 +54,7 @@ async function openTabInGroupByIndex(tab, index) {
   for (const storeId of group.containerIds || []) {
     if (!validIds.has(storeId)) continue;
 
-    const existing = await findExistingTab(tab.url, storeId);
+    const existing = await findExistingTab(url, storeId);
     if (existing) {
       if (settings.focusExisting) {
         await browser.tabs.update(existing.id, { active: true });
@@ -61,74 +63,93 @@ async function openTabInGroupByIndex(tab, index) {
       continue;
     }
 
-    await browser.tabs.create({ url: tab.url, cookieStoreId: storeId });
+    await browser.tabs.create({ url: url, cookieStoreId: storeId });
   }
+}
+
+async function openTabInGroupByIndex(tab, index) {
+  if (!tab) return;
+  await openUrlInGroupByIndex(tab.url, index);
 }
 
 /* ---------- context menu ---------- */
 
-async function rebuildContextMenus() {
-  try { await browser.contextMenus.removeAll(); } catch (_) {}
+const CONTEXT_DEFS = [
+  { type: "tab", rootId: "root-tab", titleKey: "menuRootTitle" },
+  { type: "link", rootId: "root-link", titleKey: "menuRootTitleLink" }
+];
 
-  browser.contextMenus.create({
-    id: MENU_ROOT_ID,
-    title: t("menuRootTitle"),
-    contexts: ["tab"]
-  });
+async function rebuildContextMenus() {
+  try { await browser.contextMenus.removeAll(); } catch (_) { }
 
   const groups = await getGroups();
 
-  if (groups.length === 0) {
+  for (const ctx of CONTEXT_DEFS) {
     browser.contextMenus.create({
-      id: "no-groups",
-      parentId: MENU_ROOT_ID,
-      title: t("noGroupsConfigured"),
-      enabled: false,
-      contexts: ["tab"]
+      id: ctx.rootId,
+      title: t(ctx.titleKey),
+      contexts: [ctx.type]
     });
-    return;
-  }
 
-  for (const g of groups) {
+    if (groups.length === 0) {
+      browser.contextMenus.create({
+        id: `no-groups-${ctx.type}`,
+        parentId: ctx.rootId,
+        title: t("noGroupsConfigured"),
+        enabled: false,
+        contexts: [ctx.type]
+      });
+      continue;
+    }
+
+    for (const g of groups) {
+      browser.contextMenus.create({
+        id: `group:${g.id}:${ctx.type}`,
+        parentId: ctx.rootId,
+        title: g.name || t("unnamedGroup"),
+        contexts: [ctx.type]
+      });
+    }
+
     browser.contextMenus.create({
-      id: `group:${g.id}`,
-      parentId: MENU_ROOT_ID,
-      title: g.name || t("unnamedGroup"),
-      contexts: ["tab"]
+      id: `sep-${ctx.type}`,
+      parentId: ctx.rootId,
+      type: "separator",
+      contexts: [ctx.type]
+    });
+
+    browser.contextMenus.create({
+      id: `open-options-${ctx.type}`,
+      parentId: ctx.rootId,
+      title: t("editGroupsMenuItem"),
+      contexts: [ctx.type]
     });
   }
-
-  browser.contextMenus.create({
-    id: "sep",
-    parentId: MENU_ROOT_ID,
-    type: "separator",
-    contexts: ["tab"]
-  });
-
-  browser.contextMenus.create({
-    id: "open-options",
-    parentId: MENU_ROOT_ID,
-    title: t("editGroupsMenuItem"),
-    contexts: ["tab"]
-  });
 }
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (!tab || !tab.url || !/^https?:\/\//i.test(tab.url)) return;
-
-  if (info.menuItemId === "open-options") {
+  if (String(info.menuItemId).startsWith("open-options-")) {
     browser.runtime.openOptionsPage();
     return;
   }
 
+  const url = info.linkUrl || (tab && tab.url);
+  if (!url) return;
+
   if (!String(info.menuItemId).startsWith("group:")) return;
 
+  // Format is "group:GROUP_ID:TYPE"
+  const parts = String(info.menuItemId).split(":");
+  if (parts.length < 3) return;
+
+  const groupId = parts[1];
+
   const groups = await getGroups();
-  const group = groups.find(g => `group:${g.id}` === info.menuItemId);
+  const group = groups.find(g => g.id === groupId);
   if (!group) return;
 
   const index = groups.indexOf(group);
-  await openTabInGroupByIndex(tab, index);
+  await openUrlInGroupByIndex(url, index);
 });
 
 /* ---------- keyboard shortcuts ---------- */
