@@ -89,7 +89,7 @@ jobs:
 
       - name: Create GitHub Release and upload asset
         if: ${{ !env.ACT }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.find.outputs.xpi_path }}
           body_path: ${{ steps.notes.outputs.notes_path }}
