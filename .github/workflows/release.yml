@@ -14,12 +14,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Verify tag matches manifest.json version
         shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
-          $tag = "${{ github.ref_name }}".TrimStart("v")
+          $tag = $env:TAG.TrimStart("v")
           Write-Host "Tag version: $tag"
 
           $manifest = Get-Content ./manifest.json -Raw | ConvertFrom-Json
@@ -58,8 +62,10 @@ jobs:
       - name: Generate release notes from CHANGELOG
         id: notes
         shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
-          $tag = "${{ github.ref_name }}".TrimStart("v")
+          $tag = $env:TAG.TrimStart("v")
           $changelogPath = Join-Path $PWD "CHANGELOG.md"
 
           if (-not (Test-Path $changelogPath)) {
@@ -89,7 +95,7 @@ jobs:
 
       - name: Create GitHub Release and upload asset
         if: ${{ !env.ACT }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
           files: ${{ steps.find.outputs.xpi_path }}
           body_path: ${{ steps.notes.outputs.notes_path }}
